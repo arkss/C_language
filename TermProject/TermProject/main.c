@@ -1,7 +1,7 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 // 선수 정보를 저장하는 구조체
 struct player
@@ -13,16 +13,24 @@ struct player
     int weight; // 체중
 };
 
+//전역변수
+struct player list[10];
+int count;  // 선수의 수 저장
+FILE *fp;
+
+void func(void (*funcp)(void));
+void player_search(void); // 선수 검색
+void player_enrollment(void); // 선수 등록
+void player_delete(void); // 선수 삭제
+void player_list(void); // 선수목록
+
 
 int main(void)
 {
-    struct player list[10];
+    //struct player list[10];
     int num;
-    int i, index;
-    int count;  // 선수의 수 저장
+    int i;
     int res;
-    char temp[20];
-    FILE *fp;
     
     while (1)
     {
@@ -57,118 +65,149 @@ int main(void)
         {
             case 1: // 선수 검색
             {
-                while (1)
-                {
-                    printf("선수의 이름을 입력하세요. 검색을 종료하시려면 end를 입력하세요.\n");
-                    scanf("%s",temp);
-                    if (strcmp(temp,"end")==0)
-                        break;
-                    i = 0;
-                    while (1)
-                    {
-                        if (strcmp(temp,list[i].name)==0)
-                        {
-                            printf("----검색한 선수의 프로필----\n");
-                            printf("이름 : %s\n출생년도 : %d\n포지션 : %s\n신장 : %d\n몸무게 : %d\n", list[i].name,list[i].birth_year,list[i].position,list[i].height,list[i].weight);
-                            break;
-                        }
-                        i++;
-                        if (i == count)
-                        {
-                            printf("검색한 선수는 존재하지 않습니다.\n");
-                            break;
-                        }
-                    }
-                
-                }
+                func(player_search);
                 break;
             }
             case 2: // 선수 등록
-                fp = fopen("player.txt","a");
-                while (1)
-                {
-                    printf("새로운 선수를 추가합니다.\n");
-                    printf("추가할 선수의 이름을 입력하세요. 종료하려면 end를 입력하세요.\n");
-                    scanf("%s",temp);
-                    if (strcmp(temp,"end")==0)
-                        break;
-                    i = count + 1; // 마지막 선수의 다음 index에 추가를 해주기 위해 i의 값을 다음과 같이 지정
-                    count++; // 선수가 추가되므로 선수를 하나 늘려준다.
-                    strcpy(list[i].name,temp);
-                    printf("추가할 선수의 출생년도를 입력하세요.\n");
-                    scanf("%d",&list[i].birth_year);
-                    printf("추가할 선수의 포지션을 입력하세요.\n");
-                    scanf("%s",list[i].position);
-                    printf("추가할 선수의 키를 입력하세요.\n");
-                    scanf("%d",&list[i].height);
-                    printf("추가할 선수의 몸무게를 입력하세요.\n");
-                    scanf("%d",&list[i].weight);
-                    printf("선수등록이 완료 되었습니다.\n");
-                    
-                    fprintf(fp,"%s %d %s %d %d\n",list[i].name,list[i].birth_year,list[i].position,list[i].height,list[i].weight);
-                    
-                }
-                fclose(fp);
-                break;
-                
-            case 3: // 선수 삭제
             {
-                while(1)
-                {
-                    printf("기존의 선수를 삭제합니다.\n");
-                    printf("삭제할 선수의 이름을 입력하세요. 종료하려면 end를 입력하세요.\n");
-                    scanf("%s",temp);
-                    if (strcmp(temp,"end")==0)
-                        break;
-                    for(i=0;i<count;i++)
-                    {
-                        // 입력한 선수의 정보 찾기
-                        if (strcmp(list[i].name, temp)==0)
-                        {
-                            printf("%s의 정보를 삭제합니다.\n",list[i].name);
-                            index = i; // 삭제할 선수의 index 저장
-                            break;
-                        }
-                    }
-                    if (i == count) // 마지막 선수까지 확인했을 때 동일한 선수가 없으면
-                    {
-                        printf("입력한 선수는 존재하지 않습니다.\n");
-                        break;
-                    }
-                    for(i=index;i<count-1;i++)
-                    {
-                        list[i] = list[i+1];
-                    }
-                    count--; // 삭제되었으므로 전체 선수의 하나 감소
-                    fp = fopen("player.txt","w");
-                    for(i=0;i<count;i++) // 다시 파일에 써주기
-                    {
-                        fprintf(fp,"%s %d %s %d %d\n",list[i].name,list[i].birth_year,list[i].position,list[i].height,list[i].weight);
-                    }
-                     fclose(fp);
-                }
-               
+                func(player_enrollment);
                 break;
             }
-                
-            case 4:
-                printf("등록된 선수들의 명단입니다.\n");
-                printf("\t선수이름\t\t 출생년도\t포지션\t 키\t   몸무게\n");
-                for (i=0;i<count;i++)
-                {
-                    printf("%2d. %-13s %-4d %-9s %-6d %3d\n",i+1,list[i].name,list[i].birth_year,list[i].position, list[i].height,list[i].weight);
-                }
+            case 3: // 선수 삭제
+            {
+                func(player_delete);
                 break;
-                
+            }
+            case 4: // 선수명단
+            {
+                func(player_list);
+                break;
+            }
             case 5:
                 printf("프로그램을 종료합니다. 이용해주셔서 감사합니다.\n");\
                 exit(0);
-                
-                    
-                
         }
-        
-        
-        
     }
 }
+
+void func(void (*funcp)(void))
+{
+    funcp();
+}
+
+void player_search(void)
+{
+    char temp[20];
+    int i;
+    
+    while (1)
+    {
+        printf("선수의 이름을 입력하세요. 검색을 종료하시려면 end를 입력하세요.\n");
+        scanf("%s",temp);
+        if (strcmp(temp,"end")==0)
+            break;
+        i = 0;
+        while (1)
+        {
+            if (strcmp(temp,list[i].name)==0)
+            {
+                printf("----검색한 선수의 프로필----\n");
+                printf("이름 : %s\n출생년도 : %d\n포지션 : %s\n신장 : %d\n몸무게 : %d\n", list[i].name,list[i].birth_year,list[i].position,list[i].height,list[i].weight);
+                break;
+            }
+            i++;
+            if (i == count)
+            {
+                printf("검색한 선수는 존재하지 않습니다.\n");
+                break;
+            }
+        }
+    }
+}
+
+void player_enrollment(void)
+{
+    char temp[20];
+    int i;
+    
+    fp = fopen("player.txt","a");
+    while (1)
+    {
+        printf("새로운 선수를 추가합니다.\n");
+        printf("추가할 선수의 이름을 입력하세요. 종료하려면 end를 입력하세요.\n");
+        scanf("%s",temp);
+        if (strcmp(temp,"end")==0)
+            break;
+        i = count + 1; // 마지막 선수의 다음 index에 추가를 해주기 위해 i의 값을 다음과 같이 지정
+        count++; // 선수가 추가되므로 선수를 하나 늘려준다.
+        strcpy(list[i].name,temp);
+        printf("추가할 선수의 출생년도를 입력하세요.\n");
+        scanf("%d",&list[i].birth_year);
+        printf("추가할 선수의 포지션을 입력하세요.\n");
+        scanf("%s",list[i].position);
+        printf("추가할 선수의 키를 입력하세요.\n");
+        scanf("%d",&list[i].height);
+        printf("추가할 선수의 몸무게를 입력하세요.\n");
+        scanf("%d",&list[i].weight);
+        printf("선수등록이 완료 되었습니다.\n");
+        
+        fprintf(fp,"%s %d %s %d %d\n",list[i].name,list[i].birth_year,list[i].position,list[i].height,list[i].weight);
+        
+    }
+    fclose(fp);
+}
+
+void player_delete(void)
+{
+    char temp[20];
+    int i;
+    int index;
+    
+    while(1)
+    {
+        printf("기존의 선수를 삭제합니다.\n");
+        printf("삭제할 선수의 이름을 입력하세요. 종료하려면 end를 입력하세요.\n");
+        scanf("%s",temp);
+        if (strcmp(temp,"end")==0)
+            break;
+        for(i=0;i<count;i++)
+        {
+            // 입력한 선수의 정보 찾기
+            if (strcmp(list[i].name, temp)==0)
+            {
+                printf("%s의 정보를 삭제합니다.\n",list[i].name);
+                index = i; // 삭제할 선수의 index 저장
+                break;
+            }
+        }
+        if (i == count) // 마지막 선수까지 확인했을 때 동일한 선수가 없으면
+        {
+            printf("입력한 선수는 존재하지 않습니다.\n");
+            break;
+        }
+        for(i=index;i<count-1;i++)
+        {
+            list[i] = list[i+1];
+        }
+        count--; // 삭제되었으므로 전체 선수의 하나 감소
+        fp = fopen("player.txt","w");
+        for(i=0;i<count;i++) // 다시 파일에 써주기
+        {
+            fprintf(fp,"%s %d %s %d %d\n",list[i].name,list[i].birth_year,list[i].position,list[i].height,list[i].weight);
+        }
+        fclose(fp);
+    }
+    
+}
+
+void player_list(void)
+{
+    int i;
+    printf("등록된 선수들의 명단입니다.\n");
+    printf("\t선수이름\t\t 출생년도\t포지션\t 키\t   몸무게\n");
+    for (i=0;i<count;i++)
+    {
+        printf("%2d. %-13s %-4d %-9s %-6d %3d\n",i+1,list[i].name,list[i].birth_year,list[i].position, list[i].height,list[i].weight);
+    }
+}
+
