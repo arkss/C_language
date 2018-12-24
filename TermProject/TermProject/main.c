@@ -4,17 +4,22 @@
 
 
 // 선수 정보를 저장하는 구조체
-typedef struct
+struct player
 {
     char name[20]; // 선수이름
     int birth_year; // 선수 탄생년도
     char position[8]; // 포지션
     int height; // 신장
     int weight; // 체중
-}Player;
+    
+    struct player *next;
+};
+
+
 
 //전역변수
-Player *pp; // player pointer
+struct player *pp; // player pointer
+struct player *head, *current;
 int count;  // 선수의 수 저장
 FILE *fp;
 
@@ -33,6 +38,8 @@ int main(void)
     int res;
     int size = 10;
     
+    
+    
     while (1)
     {
         fp = fopen("player.txt","r");
@@ -44,7 +51,9 @@ int main(void)
         printf("파일을 읽었습니다.\n");
         
         // 몇 명의 선수가 입력될지 모르니 동적할당으로 입력
-        pp = (Player *)calloc(size, sizeof(Player));
+        pp = (
+              struct player *)calloc(size, sizeof(
+                                                  struct player));
         
         //파일에서 읽어온 데이터를 구조체 변수에 저장하기
         i=0;
@@ -55,7 +64,9 @@ int main(void)
             if (i == size)
             {
                 size += 5;
-                pp = (Player *)realloc(pp,size*sizeof(Player));
+                pp = (
+                      struct player *)realloc(pp,size*sizeof(
+                                                      struct player));
             }
             res = fscanf(fp,"%s %d %s %d %d",pp[i].name, &pp[i].birth_year, pp[i].position, &pp[i].height, & pp[i].weight);
             
@@ -66,6 +77,20 @@ int main(void)
         fclose(fp);
         // 선수가 몇 명인지 count에 저장
         count = i;
+        
+        // 자기 참조 구조체 연결
+        if (count > 0)
+        // 파일의 아무 값도 없을 수도 있으니 한 개라도 값이 들어올 경우 초기화 head 초기화
+        {
+            head = &pp[0];
+            current = head;
+        }
+        
+        for (i=0;i<count-1;i++)
+        {
+            pp[i].next = &pp[i+1];
+        }
+        pp[count-1].next = 0;
         
         printf("총 %d명의 선수가 등록되어있습니다.\n",count);
         printf("(1) 선수검색\n(2) 선수등록\n(3) 선수삭제\n(4) 선수목록\n(5)프로그램 종료\n");
@@ -216,67 +241,16 @@ void player_list(void)
     int i;
     printf("등록된 선수들의 명단입니다.\n");
     printf("\t선수이름\t\t 출생년도\t포지션\t 키\t   몸무게\n");
-    for (i=0;i<count;i++)
+//    for (i=0;i<count;i++)
+//    {
+//        printf("%2d. %-13s %-4d %-9s %-6d %3d\n",i+1,pp[i].name,pp[i].birth_year,pp[i].position, pp[i].height,pp[i].weight);
+//
+    i = 0;
+    while (current != NULL)
     {
-        printf("%2d. %-13s %-4d %-9s %-6d %3d\n",i+1,pp[i].name,pp[i].birth_year,pp[i].position, pp[i].height,pp[i].weight);
+        
+        printf("%2d. %-13s %-4d %-9s %-6d %3d\n",i+1,current->name,current->birth_year,current->position, current->height,current->weight);
+        current = current->next;
+        i++;
     }
 }
-
-
-
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
-//
-//struct player
-//{
-//    char name[5];
-//    int age;
-//};
-//
-//int main(int argc, const char * argv[]) {
-//
-//
-//    int num;
-//    char temp[20];
-//    int cnt = 0;
-//    int size = 5;
-//    struct player *pi;
-//
-//    pi = (struct player *)calloc(size, sizeof(struct player));
-//
-//    while(1)
-//    {
-//        printf("이름을 입력하세여\n");
-//        scanf("%s",temp);
-//        printf("값을 입력하세여\n");
-//        scanf("%d",&num);
-//        if (num < 0)
-//            break;
-//        if (cnt<size)
-//        {
-//            strcpy(pi[cnt].name,temp);
-//            pi[cnt].age = num;
-//            cnt++;
-//        }
-//        else
-//        {
-//            printf("공간이 커진당다아\n");
-//            size += 5;
-//            pi = (struct player *)realloc(pi,size*sizeof(struct player));
-//            strcpy(pi[cnt].name,temp);
-//            pi[cnt].age = num;
-//            cnt++;
-//        }
-//
-//    }
-//
-//    for (int i=0;i<cnt;i++)
-//    {
-//        printf("%s %5d",pi[i].name,pi[i].age);
-//    }
-//    free(pi);
-//    return 0;
-//
-//}
-//
