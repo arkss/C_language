@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define close_file fclose(fp)
 
 // 선수 정보를 저장하는 구조체
 struct player
@@ -74,7 +75,7 @@ int main(void)
             printf("%s %d %s %d %d\n",pp[i].name, pp[i].birth_year, pp[i].position, pp[i].height,  pp[i].weight);
             i++;
         }
-        fclose(fp);
+        close_file;
         // 선수가 몇 명인지 count에 저장
         count = i;
         
@@ -190,7 +191,7 @@ void player_enrollment(void)
         fprintf(fp,"%s %d %s %d %d\n",pp[i].name,pp[i].birth_year,pp[i].position,pp[i].height,pp[i].weight);
         
     }
-    fclose(fp);
+    close_file;
 }
 
 void player_delete(void)
@@ -231,7 +232,7 @@ void player_delete(void)
         {
             fprintf(fp,"%s %d %s %d %d\n",pp[i].name,pp[i].birth_year,pp[i].position,pp[i].height,pp[i].weight);
         }
-        fclose(fp);
+        close_file;
     }
     
 }
